@@ -9,7 +9,7 @@ A: The `Naked Twins` algorithm can be implemented with the following strategy:
 ```
 boxes = [box for box, value in values.items() if len(value) == 2]
 ```
-2. Generate the twins list. Pair all boxes with the same value.
+2. Generate the twins list. Pair all boxes with the same value and remove the duplicates.
 3. Loop through each twins:
 	1. Locate the boxes to eliminate. Those boxes should be the common peers of the twins.
 	```

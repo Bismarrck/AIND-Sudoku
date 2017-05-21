@@ -18,14 +18,12 @@ row_units = [cross(r, cols) for r in rows]
 column_units = [cross(rows, c) for c in cols]
 square_units = [cross(rs, cs) 
                 for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
-unitlist = row_units + column_units + square_units
 t_diag_units = [list(map(lambda s,t: s + t, rows, cols))]
 r_diag_units = [list(map(lambda s,t: s + t, rows, reversed(cols)))]
 diag_units = t_diag_units + r_diag_units
-unitlist += diag_units
+unitlist = row_units + column_units + square_units + diag_units
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 peers = dict((s, set(sum(units[s], [])) - set([s])) for s in boxes)
-
 
 
 def assign_value(values, box, value):
@@ -53,18 +51,31 @@ def naked_twins(values):
         the values dictionary with the naked twins eliminated from peers.
     """
 
+    # Find all boxes with two possible digits.
     boxes = [box for box, value in values.items() if len(value) == 2]
-    twins_list = [[a, b] for a in boxes for b in peers[a] 
-                  if values[a] == values[b]]
+
+    # Pair the boxes and remove duplicates.
+    twins_list = []
+    twins_ids = []
+    for a in boxes:
+        for b in peers[a]:
+            if values[a] != values[b]:
+                continue
+            twins_id = "".join(sorted([a, b]))
+            if twins_id in twins_ids:
+                continue
+            twins_list.append([a, b])
+            twins_ids.append(twins_id)
 
     for a, b in twins_list:
+        # Find the common peers of twins a and b.
         boxes = peers[a].intersection(peers[b])
-        va, vb = values[a]
-        for box in [box for box in boxes if len(values[box]) > 2]:
-            if va in values[box]:
-                assign_value(values, box, values[box].replace(va, ""))
-            if vb in values[box]:
-                assign_value(values, box, values[box].replace(vb, ""))
+
+        # Only remove values from the boxes with at least two possible digits.
+        for box in [box for box in boxes if len(values[box]) >= 2]:
+            for v in values[a]:
+                if v in values[box]:
+                    assign_value(values, box, values[box].replace(v, ""))
     return values
 
 
@@ -154,7 +165,7 @@ def reduce_puzzle(values):
         # Use the Eliminate Strategy
         values = eliminate(values)
 
-        # Use the Only Choice Strategy
+         # Use the Only Choice Strategy
         values = only_choice(values)
 
         # Use the Naked Twins Strategy
@@ -205,11 +216,14 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
-    return search(grid_values(grid))
+    values = grid_values(grid)
+    return search(values)
 
 
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    diag_sudoku_grid = '9.1....8.8.5.7..4.2.4....6...7......5..............83.3..6......9................'
+    diag_sudoku_grid = '........4......1.....6......7....2.8...372.4.......3.7......4......5.6....4....2.'
     display(solve(diag_sudoku_grid))
 
     try:
