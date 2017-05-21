@@ -3,11 +3,29 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
+A: The `Naked Twins` algorithm can be implemented with the following strategy:
+
+1. Find all boxes who has two possible digits.
+```
+boxes = [box for box, value in values.items() if len(value) == 2]
+```
+2. Generate the twins list. Pair all boxes with the same value.
+3. Loop through each twins:
+	1. Locate the boxes to eliminate. Those boxes should be the common peers of the twins.
+	```
+	boxes = peers[a].intersection(peers[b])
+	```
+	2. Remove the values of the twins from those boxes.
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: Solving the diagonal sudoku problem is straightforward: just adding the diagonal boxes to the constraint lists.
+
+```
+t_diag_units = [list(map(lambda s,t: s + t, rows, cols))]
+r_diag_units = [list(map(lambda s,t: s + t, rows, reversed(cols)))]
+diag_units = t_diag_units + r_diag_units
+```
 
 ### Install
 
